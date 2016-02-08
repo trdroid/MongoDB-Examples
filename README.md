@@ -22,7 +22,7 @@ https://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/#install-mong
 
 > droid@droidserver:~/onGit/MongoDB$ sudo apt-get update
 
-<b> Install the latest stable version 
+<b> Install the latest stable version </b>
 
 > droid@droidserver:~/onGit/MongoDB$ sudo apt-get install -y mongodb-org
 
