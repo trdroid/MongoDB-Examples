@@ -253,13 +253,6 @@ An attempt to update the "documents" for 'Keith'
 Here are some failed attempts:
 
 ```javascript
-db.users.update({username: 'Keith'}, { $push : { drafts : {
-		documents: ["doc2", "doc5"]
-	}
-}})
-```
-
-```javascript
 > db.users.update({username: 'Keith'}, { $push : { drafts : {
 ... documents: ["doc2", "doc5"]
 ... }
@@ -273,9 +266,6 @@ WriteResult({
 		"errmsg" : "The field 'drafts' must be an array but is of type Object in document {_id: ObjectId('56b95a19b33e3f9978550174')}"
 	}
 })
-
-> db.users.find({username: 'Keith'})
-{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
 
 > db.users.update({username: 'Keith'}, { $push : { drafts : {
 ... documents: "doc2"
@@ -305,3 +295,92 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 > db.users.find({username: 'Keith'})
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5" ], "emails" : [ "email15", "email18" ] } }
 ```
+
+Here are the queries from above that failed:
+
+```javascript
+/*
+ didn't work because the $push operator expects a JSON object with a key that points to an array
+ that is why the error says "The field 'drafts' must be an array but is of type Object in document"
+*/	
+db.users.update({username: 'Keith'}, { $push : { drafts : {
+		documents: ["doc2", "doc5"]
+	}
+}})
+
+//failed for the same reason, $push expects drafts to be an array
+db.users.update({username: 'Keith'}, { $push : { drafts : {
+		documents: "doc2"
+	}
+}})
+
+/*
+ even though drafts.documents is an array, it has to be enclosed in quotation marks!! 
+ this is the reason for the syntax error
+*/
+db.users.update({username: 'Keith'}, { $push : { drafts.documents : ["doc2", "doc5"]
+}})
+```
+
+Here is the query that was successful:
+
+```javascript
+/*
+ works because $push is passed a json object with the key enclosed in quotes and which points to an array object
+ The new value "doc5" is pushed into the array pointed to by 'drafts.documents'
+*/ 
+db.users.update({username: 'Keith'}, { $push : { 'drafts.documents' : "doc5" }})
+```
+
+Using the correct syntax for pushing, lets observe the following:
+
+```javascript
+//attempting to push an array object into an array
+> db.users.update({username: 'Keith'}, { $push : { 'drafts.documents' : ["doc5", "doc7"]
+... }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+//the 'drafts.documents' now contains an array entry, so to add multiple documents, add one after another, not as an array
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", [ "doc5", "doc7" ] ], "emails" : [ "email15", "email18" ] } }
+
+//reset to original values
+> db.users.update( {username: 'Keith'}, {$set: { drafts: {
+... documents: ["doc1", "doc2", "doc5"],
+... emails: ["email15", "email18"]
+... }
+... }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+//query to verify
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5" ], "emails" : [ "email15", "email18" ] } }
+```
+
+Adding a duplicate value using $push
+
+```javascript
+//adding a duplicate document 'doc5' which is allowed with the $push operator
+> db.users.update({username: 'Keith'}, { $push : { 'drafts.documents' : "doc5" }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+//notice the duplicate value
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5" ], "emails" : [ "email15", "email18" ] } }
+```
+
+Avoid entering duplicate values using $addToSet operator
+
+```javascript
+/*
+attempting to add a duplicate value 'doc2' using the $addToSet operator. 
+The following executes but does not add the duplicate value
+*/
+> db.users.update({username: 'Keith'}, { $addToSet : { 'drafts.documents' : "doc2" }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
+
+//Notice there is only a single 'doc2'
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5" ], "emails" : [ "email15", "email18" ] } }
+```
+
