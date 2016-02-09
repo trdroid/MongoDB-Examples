@@ -172,4 +172,32 @@ Querying:
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
 ```
     
+<b> Updating a nested object </b>
 
+MongoDB's query language has the ability to reach and update nested objects.
+
+To update the new set of "documents" which are "drafts":
+
+```javascript
+db.users.update( {username: 'Keith'}, {$set: { drafts: {
+		documents: ["doc1", "doc10"]	
+	}
+}})
+```
+
+Running it in shell:
+
+```javascript
+> db.users.update( {username: 'Keith'}, {$set: { drafts: {
+... documents: ["doc1", "doc10"]
+... }
+... }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+Querying:
+
+```javascript
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc10" ] } }
+```
