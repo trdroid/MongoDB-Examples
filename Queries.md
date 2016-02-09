@@ -37,7 +37,7 @@ The document inserted is "{username: 'Bob'}". Documents are represented in JSON 
 
 On executing the statement, a small pause implies the creation of the database "sample" and the collection "users".
 
-Query the database ("sample") collection ("users")
+<b>Query the database collection</b>
 
     > db.users.find()
     { "_id" : ObjectId("56b95154b33e3f9978550173"), "username" : "Bob" }
