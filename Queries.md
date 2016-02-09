@@ -117,7 +117,20 @@ A new property can be added to an existing document by using the update() method
 
 The update() method finds the documents with the username 'Keith' and sets the 'age' property to 25
 
-When queried for the document containing 'Keith', the newly added property can be seen.
+By default, the update() method performs an update operation only on the first matching document. 
+
+To apply the update operations to all matching documents, then a flag must be specified in the update() method.
+
+The multi-update flag is indicated by the fourth argument to the update() method.
+
+```javascript
+> db.users.update({username: 'Keith'}, 
+					{$set: {age: 25}},
+					false,
+					true)  //<------ multi-update flag
+```
+
+When queried for the document containing 'Keith', the newly added property can be found in the document.
 
 ```javascript
 > db.users.find({username: 'Keith'})
@@ -233,4 +246,62 @@ To just add an element to the list, use either of the following operators
 * $push - duplication allowed
 * $addToSet - prevents duplication
  
+An attempt to update the "documents" for 'Keith'
+* Find a document that matches username 'Keith'
+* update the found document by adding to 'documents' in 'drafts' 
 
+Here are some failed attempts:
+
+```javascript
+db.users.update({username: 'Keith'}, { $push : { drafts : {
+		documents: ["doc2", "doc5"]
+	}
+}})
+```
+
+```javascript
+> db.users.update({username: 'Keith'}, { $push : { drafts : {
+... documents: ["doc2", "doc5"]
+... }
+... }})
+WriteResult({
+	"nMatched" : 0,
+	"nUpserted" : 0,
+	"nModified" : 0,
+	"writeError" : {
+		"code" : 16837,
+		"errmsg" : "The field 'drafts' must be an array but is of type Object in document {_id: ObjectId('56b95a19b33e3f9978550174')}"
+	}
+})
+
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
+
+> db.users.update({username: 'Keith'}, { $push : { drafts : {
+... documents: "doc2"
+... }
+... }})
+WriteResult({
+	"nMatched" : 0,
+	"nUpserted" : 0,
+	"nModified" : 0,
+	"writeError" : {
+		"code" : 16837,
+		"errmsg" : "The field 'drafts' must be an array but is of type Object in document {_id: ObjectId('56b95a19b33e3f9978550174')}"
+	}
+})
+
+> db.users.update({username: 'Keith'}, { $push : { drafts.documents : {
+... ["doc2", "doc5"]
+... }
+... }})
+2016-02-09T11:26:24.220-0500 E QUERY    [thread1] SyntaxError: missing : after property id @(shell):1:55
+
+//SUCCESSFUL
+> db.users.update({username: 'Keith'}, { $push : { 'drafts.documents' : "doc5" }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+//doc5 added to drafts.documents
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5" ], "emails" : [ "email15", "email18" ] } }
+```
