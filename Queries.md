@@ -1,3 +1,19 @@
+### MongoDB Server Version
+
+```shell
+$ mongod --version
+db version v3.2.1
+git version: a14d55980c2cdc565d4704a7e3ad37e4e535c1b2
+OpenSSL version: OpenSSL 1.0.1f 6 Jan 2014
+allocator: tcmalloc
+modules: none
+build environment:
+    distmod: ubuntu1404
+    distarch: x86_64
+    target_arch: x86_64
+
+```
+
 ### MongoDB shell
 
 MongoDB shell allows interacting and administering the MongoDB database server.
@@ -230,7 +246,7 @@ Notice how the key of the query selector uses the dot notation to refer to a nes
 
 The dot notation instructs the query engine to look for a key named 'drafts' that points to an object with an inner key "documents" that contains the value "doc1"
 
-<b> ALSO NOTICE: when using a dot operator, the expression that points to an item should be enclosed in quotes </b>
+<b> ALSO NOTICE: when using a dot operator, the expression that contains the dot operator should be enclosed in quotes </b>
 
 	In db.users.find({username: 'Keith'}), username is not enclosed in quotes, whereas 
 	
@@ -308,7 +324,8 @@ Here are the queries from above that failed:
 ```javascript
 /*
  didn't work because the $push operator expects a JSON object with a key that points to an array
- that is why the error says "The field 'drafts' must be an array but is of type Object in document"
+ that is why the error says "The field 'drafts' must be an array but is of type Object in document",
+ as $push expects drafts in the found document to be array but it turned out to be an Object in the document
 */	
 db.users.update({username: 'Keith'}, { $push : { drafts : {
 		documents: ["doc2", "doc5"]
@@ -323,6 +340,7 @@ db.users.update({username: 'Keith'}, { $push : { drafts : {
 
 /*
  even though drafts.documents is an array, it has to be enclosed in quotation marks!! 
+ Remember! an expression containing a dot operator should be enclosed in quotes, else it results in a syntax error
  this is the reason for the syntax error
 */
 db.users.update({username: 'Keith'}, { $push : { drafts.documents : ["doc2", "doc5"]
@@ -445,5 +463,42 @@ WriteResult({ "nRemoved" : 1 })
 { "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
 ```
 
+Adding more records
+
+```javascript
+> db.users.insert({username: 'Tom'})
+WriteResult({ "nInserted" : 1 })
+> 
+> db.users.insert({username: 'Jerry'})
+WriteResult({ "nInserted" : 1 })
+> 
+> db.users.insert({username: 'Donald'})
+WriteResult({ "nInserted" : 1 })
+
+> db.users.find()
+{ "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+{ "_id" : ObjectId("56ba2556b33e3f9978550176"), "username" : "Tom" }
+{ "_id" : ObjectId("56ba2556b33e3f9978550177"), "username" : "Jerry" }
+{ "_id" : ObjectId("56ba2556b33e3f9978550178"), "username" : "Donald" }
+```
+
+Attempting to call remove() method on a collection to clear ONLY its documents
+
+```javascript
+> db.users.remove()
+2016-02-09T12:45:19.044-0500 E QUERY    [thread1] Error: remove needs a query :
+DBCollection.prototype._parseRemove@src/mongo/shell/collection.js:333:1
+DBCollection.prototype.remove@src/mongo/shell/collection.js:356:18
+@(shell):1:1
+```
+
+Calling the drop() method on a collection, removes all of its documents and indexes.
+
+```javascript
+> db.users.drop()
+true
+> db.users.find()
+> 
+```
 
 
