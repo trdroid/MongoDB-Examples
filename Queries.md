@@ -32,8 +32,11 @@ db refers to the "sample" database after switching to it.
 
 Insert a document into a collection called "users". Again, "users" does not exist before the statement is executed. It is dynamically created upon inserting the first document.
 
+```javascript
     > db.users.insert({username: 'Bob'})
     WriteResult({ "nInserted" : 1 })
+```
+
 
 The document inserted is "{username: 'Bob'}". Documents are represented in JSON format.
 
@@ -41,19 +44,23 @@ On executing the statement, a small pause implies the creation of the database "
 
 <b>Insert more documents</b>
 
+```javascript
     > db.users.insert({username: 'Keith'})
     WriteResult({ "nInserted" : 1 })
     > db.users.insert({username: 'David'})
     WriteResult({ "nInserted" : 1 })
-
+```
 
 <b>Get a count of all documents in the collection</b>
 
 Use the count() method on the collection
 
+```javascript
 > db.users.count()
 
     3
+```
+
 
 ### READ
 
@@ -61,8 +68,12 @@ Use the count() method on the collection
 
 Use find() method to return all documents in a collection.
 
+
+```javascript
     > db.users.find()
     { "_id" : ObjectId("56b95154b33e3f9978550173"), "username" : "Bob" }
+```
+
 
 Every MongoDB document requires an _id field, which acts as the document's primary key. It is unique among all _id values in the collection.
 
@@ -72,14 +83,17 @@ Upon inserting a document in a collection that does not have an _id field, a Mon
 
 The find() method can be passed a query selector, which is a document that's used to match against all documents in the collection and returns all the matching documents. 
 
+```javascript
 > db.users.find({username: 'David'})
 
     { "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+```
 
 Attempting to find a document that does not exist returns nothing
 
+```javascript
 > db.users.find({username: 'Tom'})
-
+```
 
 ### UPDATING
 
@@ -95,17 +109,21 @@ A new property can be added to an existing document by using the update() method
 * the query selector of the documents to be updated
 * using the $set operator to set a new property which is passed in as a JSON
 
+```javascript
 > db.users.update({username: 'Keith'}, {$set: {age: 25}})
 
     WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
 
 The update() method finds the documents with the username 'Keith' and sets the 'age' property to 25
 
 When queried for the document containing 'Keith', the newly added property can be seen.
 
+```javascript
 > db.users.find({username: 'Keith'})
 
     { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "age" : 25 }
+```
 
 <i> Remove an existing attribute </i>
 
@@ -113,13 +131,17 @@ To remove an existing property, use the update() method on an the collection and
 * the query selector of the documents to be updated
 * using the $unset operator to remove the property, which is specified in JSON format
 
+```javascript
 > db.users.update({username: 'Keith'}, {$unset: {age: 0}})
 
     WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
 
+```javascript
 > db.users.find({username: 'Keith'})
 
     { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith" }
+```
 
 <i> Adding an object as a property </i>
 
@@ -143,5 +165,11 @@ Pasting the above in the command line:
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
 
+Querying:
+
+```javascript
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
+```
     
 
