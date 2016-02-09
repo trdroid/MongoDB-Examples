@@ -12,6 +12,8 @@ Ensure that the <i>mongod</i> instance is running before running the MongoDB she
 
 A database name can also be provided at startup.
 
+### CREATE
+
 <b>Creating a database</b>
 
 Database and collections are created only when the documents are first inserted. This means you can switch to use a database or add to a collection that does not yet exist. It is for the same reason that a database name that does not yet exist can be provided when starting up the shell.
@@ -37,7 +39,27 @@ The document inserted is "{username: 'Bob'}". Documents are represented in JSON 
 
 On executing the statement, a small pause implies the creation of the database "sample" and the collection "users".
 
-<b>Query the database collection</b>
+<b>Insert more documents</b>
+
+        > db.users.insert({username: 'Keith'})
+        WriteResult({ "nInserted" : 1 })
+        > db.users.insert({username: 'David'})
+        WriteResult({ "nInserted" : 1 })
+
+
+<b>Get a count of all documents in the collection</b>
+
+Use the count() method on the collection
+
+> db.users.count()
+
+    3
+
+### READ
+
+<b>Query the database collection: Get all documents</b>
+
+Use find() method to return all documents in a collection.
 
     > db.users.find()
     { "_id" : ObjectId("56b95154b33e3f9978550173"), "username" : "Bob" }
@@ -46,5 +68,46 @@ Every MongoDB document requires an _id field, which acts as the document's prima
 
 Upon inserting a document in a collection that does not have an _id field, a MongoDB object ID is generated and added to the document.
 
+<b>Finding specific documents</b>
 
+The find() method can be passed a query selector, which is a document that's used to match against all documents in the collection and returns all the matching documents. 
+
+> db.users.find({username: 'David'})
+
+    { "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+
+Attempting to find a document that does not exist returns nothing
+
+> db.users.find({username: 'Tom'})
+
+
+### UPDATING
+
+Updates can be documents by using the update() method on a collection.
+
+The update() method requires two arguments:
+* which document to update
+* how to update the document and what to update it with
+
+<i>Add a new attribute (age) for an user</i>
+
+A new property can be added to an existing document by using the update() method and passing it 
+* the document to be updated
+* using the $set operator to set a new property
+
+> db.users.update({username: 'Keith'}, {$set: {age: 25}})
+
+    WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+The update() method finds the documents with the username 'Keith' and sets the 'age' property to 25
+
+When queried for the document containing 'Keith', the newly added property can be seen.
+
+> db.users.find({username: 'Keith'})
+
+    { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "age" : 25 }
+
+<i> Remove an existing attribute </i>
+
+> 
 
