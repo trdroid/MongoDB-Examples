@@ -20,15 +20,15 @@ https://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/#install-mong
 
 <b> Reload local package database </b>
 
-> droid@droidserver:~/onGit/MongoDB$ sudo apt-get update
+> $ sudo apt-get update
 
 <b> Install the latest stable version </b>
 
-> droid@droidserver:~/onGit/MongoDB$ sudo apt-get install -y mongodb-org
+> $ sudo apt-get install -y mongodb-org
 
 <b> Starting the MongoDB server </b>
 
-> droid@droidserver:~/onGit/MongoDB$ sudo service mongod start
+> $ sudo service mongod start
 
 <b> Stop MongoDB </b>
 
