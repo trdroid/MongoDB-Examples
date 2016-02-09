@@ -26,7 +26,10 @@ https://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/#install-mong
 
 > droid@droidserver:~/onGit/MongoDB$ sudo apt-get install -y mongodb-org
 
-<b> Starting the shell </b>
+<b> Starting the MongoDB server </b>
 
-> droid@droidserver:~/onGit/MongoDB$ mongo
+> droid@droidserver:~/onGit/MongoDB$ sudo service mongod start
 
+<b> Stop MongoDB </b>
+
+> $ sudo service mongod stop
