@@ -172,11 +172,9 @@ Querying:
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
 ```
     
-<b> Updating a nested object </b>
+<b> Overwrite a property's value </b>
 
-MongoDB's query language has the ability to reach and update nested objects.
-
-To update the new set of "documents" which are "drafts":
+To overwrite the "drafts" to only "documents": doc1 and doc10, set the property again
 
 ```javascript
 db.users.update( {username: 'Keith'}, {$set: { drafts: {
@@ -184,6 +182,8 @@ db.users.update( {username: 'Keith'}, {$set: { drafts: {
 	}
 }})
 ```
+
+This overwrites the value of "drafts" object to contain only "documents": [doc1, doc10]
 
 Running it in shell:
 
@@ -201,3 +201,36 @@ Querying:
 > db.users.find({username: 'Keith'})
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc10" ] } }
 ```
+
+Reassign "drafts" with "documents" and "emails" to 'Keith'.
+
+<b> Querying a nested object using a dot notation </b>
+
+To find all users containing "drafts" of "documents" with id: doc10
+
+```javascript
+> db.users.find({'drafts.documents' : 'doc1'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
+```
+Notice how the key of the query selector uses the dot notation to refer to a nested object "documents" (nested inside "drafts"). 
+
+The dot notation instructs the query engine to look for a key named 'drafts' that points to an object with an inner key "documents" that contains the value "doc1"
+
+To find all users containing "drafts" of "emails" with id: "email15"
+
+```javascript
+> db.users.find({'drafts.emails' : 'email15'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
+```
+
+<b> Updating a nested object </b>
+
+To update a nested object, the first approach is to use a $set operator, which requires the entire object to be read, updated and written back replacing the previous value. 
+
+A better approach is to rely on MongoDB's query language as it has the ability to reach and update nested objects.
+
+To just add an element to the list, use either of the following operators
+* $push - duplication allowed
+* $addToSet - prevents duplication
+ 
+
