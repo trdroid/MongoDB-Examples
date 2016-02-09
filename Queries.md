@@ -18,7 +18,7 @@ Database and collections are created only when the documents are first inserted.
 
 Since the namespace is dynamically allocated, accidental creation of databases or collections can be prevented by enabling the "strict" mode.
 
-Switch to a database "sample"
+<b>Switch to a database "sample"</b>
 
     > use sample
     switched to db sample
@@ -26,7 +26,7 @@ Switch to a database "sample"
 
 db refers to the "sample" database after switching to it.
 
-Inserting a document
+<b>Inserting a document</b>
 
 Insert a document into a collection called "users". Again, "users" does not exist before the statement is executed. It is dynamically created upon inserting the first document.
 
