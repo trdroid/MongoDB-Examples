@@ -225,10 +225,17 @@ To find all users containing "drafts" of "documents" with id: doc10
 > db.users.find({'drafts.documents' : 'doc1'})
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2" ], "emails" : [ "email15", "email18" ] } }
 ```
+
 Notice how the key of the query selector uses the dot notation to refer to a nested object "documents" (nested inside "drafts"). 
 
 The dot notation instructs the query engine to look for a key named 'drafts' that points to an object with an inner key "documents" that contains the value "doc1"
 
+<b> ALSO NOTICE: when using a dot operator, the expression that points to an item should be enclosed in quotes </b>
+
+	In db.users.find({username: 'Keith'}), username is not enclosed in quotes, whereas 
+	
+	In db.users.find({'drafts.documents' : 'doc1'}), drafts.documents which uses a dot operator is enclosed in quotes
+	
 To find all users containing "drafts" of "emails" with id: "email15"
 
 ```javascript
@@ -383,4 +390,60 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 0 })
 > db.users.find({username: 'Keith'})
 { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5" ], "emails" : [ "email15", "email18" ] } }
 ```
+
+<i>Using a dot operator in the update method's query selector's key</i>
+
+Let's assume that every drafted email with id 'email15' is linked to a drafted document with id 'doc17', add 'doc17' to 'documents' for every user with 'email15' in 'emails'
+
+```javascript
+/*
+ query selector uses a dot operator in the key
+ 
+ if drafts.emails for any user contains emails15, the add doc17 to the users documents
+*/
+> db.users.update({'drafts.emails' : 'email15'}, { $addToSet : { 'drafts.documents' : "doc17" }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+//verify 
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5", "doc17" ], "emails" : [ "email15", "email18" ] } }
+```
+
+### DELETING
+
+The remove() method can be used to remove documents. 
+
+To remove specific documents, pass it a query selector.
+
+```javascript
+> db.users.find()
+{ "_id" : ObjectId("56b95154b33e3f9978550173"), "username" : "Bob" }
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5", "doc17" ], "emails" : [ "email15", "email18" ] } }
+{ "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+
+//Remove a document with 'username': 'Bob'
+> db.users.remove({username: 'Bob'})
+WriteResult({ "nRemoved" : 1 })
+
+//Verify
+> db.users.find()
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith", "drafts" : { "documents" : [ "doc1", "doc2", "doc5", "doc5", "doc17" ], "emails" : [ "email15", "email18" ] } }
+{ "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+```
+
+<i>Using a dot operator in the query selector's key in the remove() method </i>
+
+```javascript
+/*
+ remove the documents which contains 'email15' in 'drafts.emails'
+*/
+> db.users.remove({'drafts.emails': 'email15'})
+WriteResult({ "nRemoved" : 1 })
+
+//verify
+> db.users.find()
+{ "_id" : ObjectId("56b95a26b33e3f9978550175"), "username" : "David" }
+```
+
+
 
