@@ -118,4 +118,7 @@ To remove an existing property, use the update() method on an the collection and
     WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 > db.users.find({username: 'Keith'})
-{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith" }
+
+    { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith" }
+
+
