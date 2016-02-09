@@ -41,10 +41,10 @@ On executing the statement, a small pause implies the creation of the database "
 
 <b>Insert more documents</b>
 
-        > db.users.insert({username: 'Keith'})
-        WriteResult({ "nInserted" : 1 })
-        > db.users.insert({username: 'David'})
-        WriteResult({ "nInserted" : 1 })
+    > db.users.insert({username: 'Keith'})
+    WriteResult({ "nInserted" : 1 })
+    > db.users.insert({username: 'David'})
+    WriteResult({ "nInserted" : 1 })
 
 
 <b>Get a count of all documents in the collection</b>
@@ -91,9 +91,9 @@ The update() method requires two arguments:
 
 <i>Add a new attribute (age) for an user</i>
 
-A new property can be added to an existing document by using the update() method and passing it 
-* the document to be updated
-* using the $set operator to set a new property
+A new property can be added to an existing document by using the update() method on the collection and passing it 
+* the query selector of the documents to be updated
+* using the $set operator to set a new property which is passed in as a JSON
 
 > db.users.update({username: 'Keith'}, {$set: {age: 25}})
 
@@ -109,5 +109,13 @@ When queried for the document containing 'Keith', the newly added property can b
 
 <i> Remove an existing attribute </i>
 
-> 
+To remove an existing property, use the update() method on an the collection and passing it
+* the query selector of the documents to be updated
+* using the $unset operator to remove the property, which is specified in JSON format
 
+> db.users.update({username: 'Keith'}, {$unset: {age: 0}})
+
+    WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.users.find({username: 'Keith'})
+{ "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith" }
