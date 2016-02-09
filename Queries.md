@@ -86,8 +86,8 @@ Attempting to find a document that does not exist returns nothing
 Updates can be documents by using the update() method on a collection.
 
 The update() method requires two arguments:
-* which document to update
-* how to update the document and what to update it with
+* a query selector to specify which document(s) to update, specified in JSON format
+* how to update the document and what to update it with, specified in JSON format
 
 <i>Add a new attribute (age) for an user</i>
 
@@ -121,4 +121,27 @@ To remove an existing property, use the update() method on an the collection and
 
     { "_id" : ObjectId("56b95a19b33e3f9978550174"), "username" : "Keith" }
 
+<i> Adding an object as a property </i>
+
+A new property "drafts" is added by using the $set operator. Unlike the "age" property added previously which points to a single value, the "drafts" property points to an object with key-value pairs.
+
+```javascript
+db.users.update( {username: 'Keith'}, {$set: { drafts: {
+		documents: ["doc1", "doc2"],
+		emails: ["email15", "email18"]
+	}
+}})
+```
+Pasting the above in the command line:
+
+```javascript
+> db.users.update( {username: 'Keith'}, {$set: { drafts: {
+... documents: ["doc1", "doc2"],
+... emails: ["email15", "email18"]
+... }
+... }})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+
+    
 
